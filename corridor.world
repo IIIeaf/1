@@ -19,8 +19,10 @@
     <gravity>0 0 -9.8</gravity>
 
     <physics type="ode">
-      <real_time_update_rate>1000</real_time_update_rate>
-      <max_step_size>0.001</max_step_size>
+      <!-- 500 Hz physics keeps CPU load manageable and RTF close to 1,
+           which is the primary driver of smooth actor animation. -->
+      <real_time_update_rate>500</real_time_update_rate>
+      <max_step_size>0.002</max_step_size>
       <real_time_factor>1</real_time_factor>
     </physics>
 
@@ -193,7 +195,16 @@
     -->
     <actor name="obstacle_1">
       <pose>1.5 -1.3 0.8 0 0 0</pose>
+      <!-- walk.dae is a Gazebo Classic built-in mesh; scale=0.001 makes it
+           effectively invisible so only the cylinder link visual is shown.
+           Without <skin> Gazebo emits "[Err] Invalid mesh filename extension[__default__]". -->
+      <skin>
+        <filename>walk.dae</filename>
+        <scale>0.001</scale>
+      </skin>
       <link name="body">
+        <enable_gravity>false</enable_gravity>
+        <self_collide>false</self_collide>
         <visual name="visual">
           <geometry>
             <cylinder><radius>0.15</radius><length>1.6</length></cylinder>
@@ -244,7 +255,13 @@
     -->
     <actor name="obstacle_2">
       <pose>3.5 0.1 0.8 0 0 0</pose>
+      <skin>
+        <filename>walk.dae</filename>
+        <scale>0.001</scale>
+      </skin>
       <link name="body">
+        <enable_gravity>false</enable_gravity>
+        <self_collide>false</self_collide>
         <visual name="visual">
           <geometry>
             <cylinder><radius>0.15</radius><length>1.6</length></cylinder>
@@ -295,7 +312,13 @@
     -->
     <actor name="obstacle_3">
       <pose>2.0 1.2 0.8 0 0 0</pose>
+      <skin>
+        <filename>walk.dae</filename>
+        <scale>0.001</scale>
+      </skin>
       <link name="body">
+        <enable_gravity>false</enable_gravity>
+        <self_collide>false</self_collide>
         <visual name="visual">
           <geometry>
             <cylinder><radius>0.15</radius><length>1.6</length></cylinder>
@@ -346,7 +369,13 @@
     -->
     <actor name="obstacle_4">
       <pose>4.5 -0.5 0.8 0 0 0</pose>
+      <skin>
+        <filename>walk.dae</filename>
+        <scale>0.001</scale>
+      </skin>
       <link name="body">
+        <enable_gravity>false</enable_gravity>
+        <self_collide>false</self_collide>
         <visual name="visual">
           <geometry>
             <cylinder><radius>0.15</radius><length>1.6</length></cylinder>
