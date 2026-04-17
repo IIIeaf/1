@@ -1,0 +1,394 @@
+<?xml version="1.0" ?>
+<!--
+  Gazebo Classic (.world) — Indoor Corridor with Dynamic Cylindrical Obstacles
+  =============================================================================
+  Corridor dimensions : 10 m (x-axis) × 4 m (y-axis) × 3 m (z, open ceiling)
+  Coordinate origin   : 0.5 m from the entry (back) wall, centred in y
+                        → corridor inner space: x ∈ [-0.5, 9.5], y ∈ [-2, 2]
+  Obstacles           : 4 cylinders (height 1.6 m, radius 0.15 m)
+                        each reciprocates along x on its own y-lane,
+                        never approaching the origin, never colliding.
+  Speeds              : 0.6 / 0.9 / 0.5 / 1.1 m/s
+-->
+<sdf version="1.6">
+  <world name="indoor_corridor">
+
+    <!-- ================================================================
+         Global settings
+    ================================================================ -->
+    <gravity>0 0 -9.8</gravity>
+
+    <physics type="ode">
+      <real_time_update_rate>1000</real_time_update_rate>
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1</real_time_factor>
+    </physics>
+
+    <!-- Ambient lighting -->
+    <scene>
+      <ambient>0.6 0.6 0.6 1</ambient>
+      <background>0.4 0.4 0.4 1</background>
+      <shadows>false</shadows>
+    </scene>
+
+    <!-- Directional light -->
+    <light name="sun" type="directional">
+      <cast_shadows>false</cast_shadows>
+      <pose>0 0 10 0 0 0</pose>
+      <diffuse>0.9 0.9 0.9 1</diffuse>
+      <specular>0.3 0.3 0.3 1</specular>
+      <direction>-0.5 0.1 -0.9</direction>
+    </light>
+
+    <!-- ================================================================
+         Static corridor geometry
+         All walls are 0.2 m thick.
+         Floor  : centre (4.5,  0.0, -0.05), size 10.4 × 4.4 × 0.1  m
+         Back   : centre (-0.6, 0.0,  1.5),  size 0.2  × 4.4 × 3.0  m
+         Far    : centre ( 9.6, 0.0,  1.5),  size 0.2  × 4.4 × 3.0  m
+         Left   : centre ( 4.5,-2.1,  1.5),  size 10.4 × 0.2 × 3.0  m
+         Right  : centre ( 4.5, 2.1,  1.5),  size 10.4 × 0.2 × 3.0  m
+    ================================================================ -->
+
+    <!-- Floor -->
+    <model name="floor">
+      <static>true</static>
+      <pose>4.5 0 -0.05 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box><size>10.4 4.4 0.1</size></box>
+          </geometry>
+          <surface>
+            <friction><ode><mu>1.0</mu><mu2>1.0</mu2></ode></friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box><size>10.4 4.4 0.1</size></box>
+          </geometry>
+          <material>
+            <ambient>0.75 0.75 0.75 1</ambient>
+            <diffuse>0.75 0.75 0.75 1</diffuse>
+            <specular>0.1 0.1 0.1 1</specular>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Back wall (entry end, x = -0.5 inner face) -->
+    <model name="wall_back">
+      <static>true</static>
+      <pose>-0.6 0 1.5 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box><size>0.2 4.4 3.0</size></box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box><size>0.2 4.4 3.0</size></box>
+          </geometry>
+          <material>
+            <ambient>0.88 0.88 0.88 1</ambient>
+            <diffuse>0.88 0.88 0.88 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Far wall (dead end, x = 9.5 inner face) -->
+    <model name="wall_far">
+      <static>true</static>
+      <pose>9.6 0 1.5 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box><size>0.2 4.4 3.0</size></box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box><size>0.2 4.4 3.0</size></box>
+          </geometry>
+          <material>
+            <ambient>0.88 0.88 0.88 1</ambient>
+            <diffuse>0.88 0.88 0.88 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Left wall (y = -2 inner face) -->
+    <model name="wall_left">
+      <static>true</static>
+      <pose>4.5 -2.1 1.5 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box><size>10.4 0.2 3.0</size></box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box><size>10.4 0.2 3.0</size></box>
+          </geometry>
+          <material>
+            <ambient>0.88 0.88 0.88 1</ambient>
+            <diffuse>0.88 0.88 0.88 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Right wall (y = +2 inner face) -->
+    <model name="wall_right">
+      <static>true</static>
+      <pose>4.5 2.1 1.5 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box><size>10.4 0.2 3.0</size></box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box><size>10.4 0.2 3.0</size></box>
+          </geometry>
+          <material>
+            <ambient>0.88 0.88 0.88 1</ambient>
+            <diffuse>0.88 0.88 0.88 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- ================================================================
+         Dynamic cylindrical obstacles (actors)
+         Each actor is a cylinder (r=0.15 m, h=1.6 m) with collision.
+         The actor pose drives the cylinder; z = 0.8 keeps the base on
+         the floor.  Waypoints encode a linear back-and-forth patrol.
+
+         Lane layout (y-coordinate, minimum inter-lane gap = 0.6 m):
+           Obstacle 1 : y = -1.30
+           Obstacle 4 : y = -0.50   gap 0.80 m
+           Obstacle 2 : y =  0.10   gap 0.60 m
+           Obstacle 3 : y =  1.20   gap 1.10 m
+
+         Patrol ranges (all start x ≥ 1.5 → clear of origin):
+           Obstacle 1 : x ∈ [1.5, 5.5]   4.0 m  @ 0.6 m/s  → T½ = 6.667 s
+           Obstacle 2 : x ∈ [3.5, 8.5]   5.0 m  @ 0.9 m/s  → T½ = 5.556 s
+           Obstacle 3 : x ∈ [2.0, 7.0]   5.0 m  @ 0.5 m/s  → T½ = 10.00 s
+           Obstacle 4 : x ∈ [4.5, 9.0]   4.5 m  @ 1.1 m/s  → T½ = 4.091 s
+
+         Trajectory type "linear" is a user-defined label; Gazebo Classic
+         will interpolate linearly between waypoints and loop the script.
+    ================================================================ -->
+
+    <!--
+      Obstacle 1  — red cylinder
+      Lane y = -1.30, patrol x: 1.5 → 5.5, speed 0.6 m/s
+      T½ = 4.0 / 0.6 = 6.667 s   Tcycle = 13.333 s
+    -->
+    <actor name="obstacle_1">
+      <pose>1.5 -1.3 0.8 0 0 0</pose>
+      <link name="body">
+        <visual name="visual">
+          <geometry>
+            <cylinder><radius>0.15</radius><length>1.6</length></cylinder>
+          </geometry>
+          <material>
+            <ambient>0.85 0.15 0.15 1</ambient>
+            <diffuse>0.85 0.15 0.15 1</diffuse>
+            <specular>0.3 0.1 0.1 1</specular>
+          </material>
+        </visual>
+        <collision name="collision">
+          <geometry>
+            <cylinder><radius>0.15</radius><length>1.6</length></cylinder>
+          </geometry>
+          <surface>
+            <contact><ode/></contact>
+            <friction><ode><mu>0.0</mu><mu2>0.0</mu2></ode></friction>
+          </surface>
+        </collision>
+      </link>
+      <script>
+        <loop>true</loop>
+        <delay_start>0.0</delay_start>
+        <auto_start>true</auto_start>
+        <trajectory id="0" type="linear">
+          <!-- forward: x 1.5 → 5.5 -->
+          <waypoint>
+            <time>0.000</time>
+            <pose>1.5 -1.3 0.8 0 0 0</pose>
+          </waypoint>
+          <waypoint>
+            <time>6.667</time>
+            <pose>5.5 -1.3 0.8 0 0 0</pose>
+          </waypoint>
+          <!-- reverse: x 5.5 → 1.5 -->
+          <waypoint>
+            <time>13.333</time>
+            <pose>1.5 -1.3 0.8 0 0 3.14159</pose>
+          </waypoint>
+        </trajectory>
+      </script>
+    </actor>
+
+    <!--
+      Obstacle 2  — green cylinder
+      Lane y = 0.10, patrol x: 3.5 → 8.5, speed 0.9 m/s
+      T½ = 5.0 / 0.9 = 5.556 s   Tcycle = 11.111 s
+    -->
+    <actor name="obstacle_2">
+      <pose>3.5 0.1 0.8 0 0 0</pose>
+      <link name="body">
+        <visual name="visual">
+          <geometry>
+            <cylinder><radius>0.15</radius><length>1.6</length></cylinder>
+          </geometry>
+          <material>
+            <ambient>0.15 0.80 0.15 1</ambient>
+            <diffuse>0.15 0.80 0.15 1</diffuse>
+            <specular>0.1 0.3 0.1 1</specular>
+          </material>
+        </visual>
+        <collision name="collision">
+          <geometry>
+            <cylinder><radius>0.15</radius><length>1.6</length></cylinder>
+          </geometry>
+          <surface>
+            <contact><ode/></contact>
+            <friction><ode><mu>0.0</mu><mu2>0.0</mu2></ode></friction>
+          </surface>
+        </collision>
+      </link>
+      <script>
+        <loop>true</loop>
+        <delay_start>0.0</delay_start>
+        <auto_start>true</auto_start>
+        <trajectory id="0" type="linear">
+          <!-- forward: x 3.5 → 8.5 -->
+          <waypoint>
+            <time>0.000</time>
+            <pose>3.5 0.1 0.8 0 0 0</pose>
+          </waypoint>
+          <waypoint>
+            <time>5.556</time>
+            <pose>8.5 0.1 0.8 0 0 0</pose>
+          </waypoint>
+          <!-- reverse: x 8.5 → 3.5 -->
+          <waypoint>
+            <time>11.111</time>
+            <pose>3.5 0.1 0.8 0 0 3.14159</pose>
+          </waypoint>
+        </trajectory>
+      </script>
+    </actor>
+
+    <!--
+      Obstacle 3  — blue cylinder
+      Lane y = 1.20, patrol x: 2.0 → 7.0, speed 0.5 m/s
+      T½ = 5.0 / 0.5 = 10.000 s   Tcycle = 20.000 s
+    -->
+    <actor name="obstacle_3">
+      <pose>2.0 1.2 0.8 0 0 0</pose>
+      <link name="body">
+        <visual name="visual">
+          <geometry>
+            <cylinder><radius>0.15</radius><length>1.6</length></cylinder>
+          </geometry>
+          <material>
+            <ambient>0.15 0.15 0.85 1</ambient>
+            <diffuse>0.15 0.15 0.85 1</diffuse>
+            <specular>0.1 0.1 0.3 1</specular>
+          </material>
+        </visual>
+        <collision name="collision">
+          <geometry>
+            <cylinder><radius>0.15</radius><length>1.6</length></cylinder>
+          </geometry>
+          <surface>
+            <contact><ode/></contact>
+            <friction><ode><mu>0.0</mu><mu2>0.0</mu2></ode></friction>
+          </surface>
+        </collision>
+      </link>
+      <script>
+        <loop>true</loop>
+        <delay_start>0.0</delay_start>
+        <auto_start>true</auto_start>
+        <trajectory id="0" type="linear">
+          <!-- forward: x 2.0 → 7.0 -->
+          <waypoint>
+            <time>0.000</time>
+            <pose>2.0 1.2 0.8 0 0 0</pose>
+          </waypoint>
+          <waypoint>
+            <time>10.000</time>
+            <pose>7.0 1.2 0.8 0 0 0</pose>
+          </waypoint>
+          <!-- reverse: x 7.0 → 2.0 -->
+          <waypoint>
+            <time>20.000</time>
+            <pose>2.0 1.2 0.8 0 0 3.14159</pose>
+          </waypoint>
+        </trajectory>
+      </script>
+    </actor>
+
+    <!--
+      Obstacle 4  — yellow cylinder
+      Lane y = -0.50, patrol x: 4.5 → 9.0, speed 1.1 m/s
+      T½ = 4.5 / 1.1 = 4.091 s   Tcycle = 8.182 s
+    -->
+    <actor name="obstacle_4">
+      <pose>4.5 -0.5 0.8 0 0 0</pose>
+      <link name="body">
+        <visual name="visual">
+          <geometry>
+            <cylinder><radius>0.15</radius><length>1.6</length></cylinder>
+          </geometry>
+          <material>
+            <ambient>0.85 0.80 0.10 1</ambient>
+            <diffuse>0.85 0.80 0.10 1</diffuse>
+            <specular>0.3 0.3 0.1 1</specular>
+          </material>
+        </visual>
+        <collision name="collision">
+          <geometry>
+            <cylinder><radius>0.15</radius><length>1.6</length></cylinder>
+          </geometry>
+          <surface>
+            <contact><ode/></contact>
+            <friction><ode><mu>0.0</mu><mu2>0.0</mu2></ode></friction>
+          </surface>
+        </collision>
+      </link>
+      <script>
+        <loop>true</loop>
+        <delay_start>0.0</delay_start>
+        <auto_start>true</auto_start>
+        <trajectory id="0" type="linear">
+          <!-- forward: x 4.5 → 9.0 -->
+          <waypoint>
+            <time>0.000</time>
+            <pose>4.5 -0.5 0.8 0 0 0</pose>
+          </waypoint>
+          <waypoint>
+            <time>4.091</time>
+            <pose>9.0 -0.5 0.8 0 0 0</pose>
+          </waypoint>
+          <!-- reverse: x 9.0 → 4.5 -->
+          <waypoint>
+            <time>8.182</time>
+            <pose>4.5 -0.5 0.8 0 0 3.14159</pose>
+          </waypoint>
+        </trajectory>
+      </script>
+    </actor>
+
+  </world>
+</sdf>
